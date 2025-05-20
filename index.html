@@ -44,5 +44,41 @@
 
   <script src="layers/layers.js"></script>
   <script src="resources/qgis2web.js"></script>
+
+  <script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const x = parseFloat(urlParams.get("x"));
+  const y = parseFloat(urlParams.get("y"));
+  const zoom = parseInt(urlParams.get("zoom"));
+
+  if (!isNaN(x) && !isNaN(y) && !isNaN(zoom)) {
+    const target = ol.proj.fromLonLat([x, y]);
+    const interval = setInterval(() => {
+      if (typeof map !== "undefined") {
+        map.getView().setCenter(target);
+        map.getView().setZoom(zoom);
+        new ol.Overlay({
+          element: document.createElement("div"),
+          positioning: "center-center",
+          stopEvent: false,
+          offset: [0, 0],
+          position: target
+        }).setMap(map);
+
+        const marker = document.createElement("div");
+        marker.innerHTML = "📍";
+        marker.style.fontSize = "24px";
+        marker.style.transform = "translate(-50%, -100%)";
+        map.addOverlay(new ol.Overlay({
+          position: target,
+          element: marker
+        }));
+
+        clearInterval(interval);
+      }
+    }, 500);
+  }
+</script>
+
 </body>
 </html>
